@@ -1,49 +1,46 @@
 {
-  "name": "Vite + Spring Boot Dev Environment",
-  "image": "mcr.microsoft.com/devcontainers/java:21",
+  "name": "React-TS-SpringBoot Dev Container",
+  "image": "mcr.microsoft.com/devcontainers/java:1-17-bullseye",
   "features": {
     "ghcr.io/devcontainers/features/node:1": {
       "version": "18"
     },
-    "ghcr.io/devcontainers/features/git:1": {}
+    "ghcr.io/devcontainers/features/java:1": {
+      "version": "17",
+      "installMaven": "true"
+    }
   },
-
-  // Optional: Install Maven if not included in the base image
-  "postCreateCommand": "sudo apt-get update && sudo apt-get install -y maven",
-
+  "forwardPorts": [3000, 8080],
+  "portsAttributes": {
+    "3000": {
+      "label": "Frontend (React)",
+      "onAutoForward": "notify"
+    },
+    "8080": {
+      "label": "Backend (Spring Boot)",
+      "onAutoForward": "notify"
+    }
+  },
+  "postCreateCommand": "cd backend && mvn -q -DskipTests package && cd ../frontend && npm install",
   "customizations": {
     "vscode": {
       "extensions": [
         "vscjava.vscode-java-pack",
-        "vscjava.vscode-maven",
-        "github.copilot",
+        "vscjava.vscode-spring-boot-dashboard",
+        "vmware.vscode-spring-boot",
+        "redhat.java",
         "esbenp.prettier-vscode",
         "dbaeumer.vscode-eslint"
-      ]
+      ],
+      "settings": {
+        "java.configuration.runtimes": [
+          {
+            "name": "JavaSE-17",
+            "path": "/usr/local/sdkman/candidates/java/current"
+          }
+        ]
+      }
     }
   },
-
-  "forwardPorts": [8080, 5173],
-
-  "portsAttributes": {
-    "8080": {
-      "label": "Spring Boot Backend",
-      "onAutoForward": "notify"
-    },
-    "5173": {
-      "label": "Vite Frontend",
-      "onAutoForward": "notify"
-    }
-  },
-
-  "remoteUser": "vscode",
-
-  "mounts": [
-    "source=/var/run/docker.sock,target=/var/run/docker.sock,type=bind"
-  ],
-
-  "postAttachCommand": {
-    "backend": "cd backend && ./mvnw spring-boot:run",
-    "frontend": "cd frontend && npm install && npm run dev -- --host"
-  }
+  "remoteUser": "vscode"
 }
